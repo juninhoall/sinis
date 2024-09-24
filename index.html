@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardápio Sinners</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Cardápio Sinners</h1>
+    <table id="cardapio-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Produto</th>
+                <th>Valor (R$)</th>
+                <th>Categoria</th>
+                <th>Imagem</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+        const jsonUrl = './cardapio_sinners_24_09_24.json';
+        async function loadCardapio() {
+            try {
+                const response = await fetch(jsonUrl);
+                const data = await response.json();
+                const tableBody = document.querySelector('#cardapio-table tbody');
+
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.id}</td>
+                        <td>${item.Produto}</td>
+                        <td>${item.Valor.toFixed(2)}</td>
+                        <td>${item.Categoria}</td>
+                        <td><img src="${item.Imagem}" alt="${item.Produto}" width="50"></td>
+                    `;
+
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar o cardápio:', error);
+            }
+        }
+        window.onload = loadCardapio;
+    </script>
+</body>
+</html>
