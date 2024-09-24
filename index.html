@@ -4,69 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cardápio Sinners</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-        }
-        th {
-            background-color: #f4f4f4;
-        }
-    </style>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100 p-6">
 
-    <h1>Cardápio Sinners</h1>
-    <table id="cardapio-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Produto</th>
-                <th>Valor (R$)</th>
-                <th>Categoria</th>
-                <th>Imagem</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+    <h1 class="text-3xl font-bold mb-6 text-center">Cardápio Sinners</h1>
+
+    <div class="filter-container mb-6 text-center">
+        <input type="text" id="filter-product" placeholder="Filtrar por Produto" class="px-4 py-2 border rounded-md mr-4">
+        <input type="text" id="filter-category" placeholder="Filtrar por Categoria" class="px-4 py-2 border rounded-md mr-4">
+        <button onclick="applyFilter()" class="bg-blue-500 text-white px-6 py-2 rounded-md">Filtrar</button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="cardapio-cards">
+    </div>
 
     <script>
         const jsonUrl = './cardapio.json';
+        let originalData = [];  
+
         async function loadCardapio() {
             try {
                 const response = await fetch(jsonUrl);
                 const data = await response.json();
-                const tableBody = document.querySelector('#cardapio-table tbody');
-
-                data.forEach(item => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${item.id}</td>
-                        <td>${item.Produto}</td>
-                        <td>${item.Valor.toFixed(2)}</td>
-                        <td>${item.Categoria}</td>
-                        <td><img src="${item.Imagem}" alt="${item.Produto}" width="50"></td>
-                    `;
-
-                    tableBody.appendChild(row);
-                });
+                originalData = data;  // Armazena os dados originais
+                displayData(data);
             } catch (error) {
                 console.error('Erro ao carregar o cardápio:', error);
             }
         }
+
+        function displayData(data) {
+            const cardContainer = document.getElementById('cardapio-cards');
+            cardContainer.innerHTML = '';  // Limpa os cards antes de adicionar novos
+
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.classList.add('bg-white', 'p-6', 'rounded-lg', 'shadow-md', 'text-center');
+
+                card.innerHTML = `
+                    <img src="${item.Imagem}" alt="${item.Produto}" class="mx-auto mb-4 w-24 h-24 object-cover">
+                    <h3 class="text-xl font-semibold mb-2">${item.Produto}</h3>
+                    <p class="text-gray-600 mb-2">Categoria: ${item.Categoria}</p>
+                    <p class="text-gray-800 font-bold text-lg">R$ ${item.Valor.toFixed(2)}</p>
+                `;
+
+                cardContainer.appendChild(card);
+            });
+        }
+
+        function applyFilter() {
+            const productFilter = document.getElementById('filter-product').value.toLowerCase();
+            const categoryFilter = document.getElementById('filter-category').value.toLowerCase();
+            const filteredData = originalData.filter(item => {
+                const productMatch = item.Produto.toLowerCase().includes(productFilter);
+                const categoryMatch = item.Categoria.toLowerCase().includes(categoryFilter);
+                return productMatch && categoryMatch;
+            });
+
+            displayData(filteredData);
+        }
+
         window.onload = loadCardapio;
     </script>
+
 </body>
 </html>
